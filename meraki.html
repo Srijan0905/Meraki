@@ -1,0 +1,1517 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Meraki — Cinema with Soul</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;0,600;1,300;1,400;1,500&family=DM+Sans:ital,opsz,wght@0,9..40,300;0,9..40,400;0,9..40,500;1,9..40,300&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  :root {
+    --bg: #FAFAF8;
+    --ink: #1C1C1A;
+    --muted: #6E6860;
+    --accent: #A89F91;
+    --accent-light: #E8E3DC;
+    --border: #E0DAD2;
+    --serif: 'Cormorant Garamond', Georgia, serif;
+    --sans: 'DM Sans', system-ui, sans-serif;
+    --max: 1200px;
+    --gap: clamp(1.5rem, 4vw, 3rem);
+  }
+
+  html { scroll-behavior: smooth; }
+
+  body {
+    font-family: var(--sans);
+    background: var(--bg);
+    color: var(--ink);
+    font-size: 16px;
+    line-height: 1.7;
+    overflow-x: hidden;
+  }
+
+  /* ─── PROGRESS BAR ─── */
+  #progress-bar {
+    position: fixed;
+    top: 0; left: 0;
+    height: 2px;
+    background: var(--ink);
+    width: 0%;
+    z-index: 9999;
+    transition: width 0.1s linear;
+    display: none;
+  }
+
+  /* ─── NAV ─── */
+  nav {
+    position: fixed;
+    top: 0; left: 0; right: 0;
+    z-index: 100;
+    background: rgba(250,250,248,0.92);
+    backdrop-filter: blur(12px);
+    -webkit-backdrop-filter: blur(12px);
+    border-bottom: 1px solid var(--border);
+    height: 64px;
+    display: flex;
+    align-items: center;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+  }
+
+  .nav-inner {
+    width: 100%;
+    max-width: var(--max);
+    margin: 0 auto;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .logo {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    cursor: pointer;
+  }
+
+  .nav-links {
+    display: flex;
+    gap: 2.5rem;
+    list-style: none;
+  }
+
+  .nav-links a {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    font-weight: 400;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    text-decoration: none;
+    cursor: pointer;
+    position: relative;
+    padding-bottom: 2px;
+    transition: color 0.2s;
+  }
+
+  .nav-links a::after {
+    content: '';
+    position: absolute;
+    bottom: 0; left: 0;
+    width: 0; height: 1px;
+    background: var(--ink);
+    transition: width 0.3s ease;
+  }
+
+  .nav-links a:hover,
+  .nav-links a.active {
+    color: var(--ink);
+  }
+
+  .nav-links a:hover::after,
+  .nav-links a.active::after {
+    width: 100%;
+  }
+
+  /* ─── PAGE SYSTEM ─── */
+  .page {
+    display: none;
+    padding-top: 64px;
+    min-height: 100vh;
+    opacity: 0;
+    transform: translateY(12px);
+    transition: opacity 0.45s ease, transform 0.45s ease;
+  }
+
+  .page.visible {
+    display: block;
+  }
+
+  .page.active {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .container {
+    max-width: var(--max);
+    margin: 0 auto;
+    padding: 0 clamp(1.5rem, 5vw, 4rem);
+  }
+
+  /* ─── HOME ─── */
+  .hero {
+    padding: clamp(4rem, 10vw, 8rem) 0 clamp(3rem, 7vw, 5rem);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .hero-eyebrow {
+    font-size: 0.72rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1.5rem;
+    font-weight: 400;
+  }
+
+  .hero-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(2rem, 5vw, 5rem);
+    align-items: start;
+  }
+
+  .hero-title {
+    font-family: var(--serif);
+    font-size: clamp(2.8rem, 6vw, 5rem);
+    font-weight: 400;
+    line-height: 1.08;
+    letter-spacing: -0.01em;
+  }
+
+  .hero-title em {
+    font-style: italic;
+    color: var(--accent);
+  }
+
+  .hero-right {
+    padding-top: 0.5rem;
+  }
+
+  .hero-meta {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .hero-excerpt {
+    font-size: 1.05rem;
+    color: var(--muted);
+    line-height: 1.8;
+    margin-bottom: 2rem;
+    font-weight: 300;
+  }
+
+  .btn-text {
+    font-size: 0.78rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--ink);
+    text-decoration: none;
+    border-bottom: 1px solid var(--ink);
+    padding-bottom: 2px;
+    cursor: pointer;
+    transition: color 0.2s, border-color 0.2s;
+  }
+
+  .btn-text:hover {
+    color: var(--accent);
+    border-color: var(--accent);
+  }
+
+  /* Ticker */
+  .ticker-wrap {
+    border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+    padding: 0.85rem 0;
+    overflow: hidden;
+    background: var(--bg);
+  }
+
+  .ticker-label {
+    font-size: 0.68rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: inline-block;
+    margin-right: 2rem;
+    flex-shrink: 0;
+  }
+
+  .ticker-inner {
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    animation: ticker 40s linear infinite;
+  }
+
+  .ticker-item {
+    font-family: var(--serif);
+    font-size: 0.95rem;
+    font-style: italic;
+    color: var(--muted);
+    margin-right: 3rem;
+  }
+
+  .ticker-item span {
+    font-style: normal;
+    font-family: var(--sans);
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-left: 0.5rem;
+  }
+
+  @keyframes ticker {
+    from { transform: translateX(0); }
+    to { transform: translateX(-50%); }
+  }
+
+  /* Latest Reviews */
+  .section {
+    padding: clamp(3rem, 8vw, 6rem) 0;
+  }
+
+  .section-header {
+    display: flex;
+    align-items: baseline;
+    justify-content: space-between;
+    margin-bottom: clamp(1.5rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 1rem;
+  }
+
+  .section-title {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 2rem);
+    font-weight: 400;
+    letter-spacing: 0.01em;
+  }
+
+  .section-link {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    text-decoration: none;
+    cursor: pointer;
+    transition: color 0.2s;
+  }
+
+  .section-link:hover { color: var(--ink); }
+
+  .reviews-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: clamp(1.5rem, 3vw, 2.5rem);
+  }
+
+  .review-card {
+    cursor: pointer;
+  }
+
+  .review-card-img {
+    aspect-ratio: 3/4;
+    background: var(--accent-light);
+    margin-bottom: 1.25rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .review-card-img img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
+    filter: grayscale(20%);
+  }
+
+  .review-card:hover .review-card-img img {
+    transform: scale(1.03);
+  }
+
+  .review-card-img .film-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: var(--accent-light);
+    gap: 0.5rem;
+  }
+
+  .film-placeholder .fp-title {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-style: italic;
+    color: var(--muted);
+    text-align: center;
+    padding: 1rem;
+  }
+
+  .film-placeholder .fp-year {
+    font-size: 0.72rem;
+    letter-spacing: 0.1em;
+    color: var(--accent);
+  }
+
+  .dots {
+    display: flex;
+    gap: 4px;
+    margin-bottom: 0.6rem;
+  }
+
+  .dot {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--border);
+  }
+
+  .dot.filled { background: var(--ink); }
+  .dot.half { background: var(--accent); }
+
+  .review-card-genre {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.4rem;
+  }
+
+  .review-card-title {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-weight: 400;
+    line-height: 1.2;
+    margin-bottom: 0.4rem;
+  }
+
+  .review-card-dir {
+    font-size: 0.82rem;
+    color: var(--muted);
+    font-weight: 300;
+  }
+
+  /* ─── REVIEWS PAGE ─── */
+  .page-hero {
+    padding: clamp(3rem, 7vw, 5.5rem) 0 clamp(2rem, 4vw, 3rem);
+    border-bottom: 1px solid var(--border);
+  }
+
+  .page-eyebrow {
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .page-title {
+    font-family: var(--serif);
+    font-size: clamp(2.5rem, 6vw, 4.5rem);
+    font-weight: 300;
+    letter-spacing: -0.01em;
+    line-height: 1.06;
+  }
+
+  .filters {
+    padding: 1.5rem 0;
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    gap: 0.75rem;
+    flex-wrap: wrap;
+    align-items: center;
+  }
+
+  .filter-label {
+    font-size: 0.7rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-right: 0.5rem;
+  }
+
+  .filter-btn {
+    font-family: var(--sans);
+    font-size: 0.78rem;
+    letter-spacing: 0.06em;
+    padding: 0.4rem 1rem;
+    border: 1px solid var(--border);
+    background: transparent;
+    color: var(--muted);
+    cursor: pointer;
+    transition: all 0.2s;
+    border-radius: 0;
+  }
+
+  .filter-btn:hover,
+  .filter-btn.active {
+    border-color: var(--ink);
+    color: var(--ink);
+    background: var(--ink);
+    color: var(--bg);
+  }
+
+  .reviews-list {
+    padding: clamp(2rem, 5vw, 4rem) 0;
+  }
+
+  .review-row {
+    display: grid;
+    grid-template-columns: 80px 1fr auto;
+    gap: 2rem;
+    align-items: start;
+    padding: 2rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .review-row:hover { opacity: 0.7; }
+
+  .review-row-thumb {
+    aspect-ratio: 2/3;
+    background: var(--accent-light);
+    overflow: hidden;
+  }
+
+  .review-row-thumb .fp-title {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-family: var(--serif);
+    font-style: italic;
+    font-size: 0.7rem;
+    color: var(--muted);
+    text-align: center;
+    padding: 0.25rem;
+  }
+
+  .review-row-info { }
+
+  .review-row-title {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 0.3rem;
+  }
+
+  .review-row-meta {
+    font-size: 0.78rem;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    display: flex;
+    gap: 1rem;
+  }
+
+  .review-row-excerpt {
+    font-size: 0.9rem;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+    max-width: 560px;
+  }
+
+  .review-row-rating { padding-top: 0.5rem; }
+
+  /* ─── ESSAYS PAGE ─── */
+  .essays-grid {
+    padding: clamp(2rem, 5vw, 4rem) 0;
+    display: grid;
+    gap: 0;
+  }
+
+  .essay-row {
+    display: grid;
+    grid-template-columns: 1fr 3fr;
+    gap: 3rem;
+    padding: 2.5rem 0;
+    border-bottom: 1px solid var(--border);
+    cursor: pointer;
+    transition: opacity 0.2s;
+  }
+
+  .essay-row:hover { opacity: 0.65; }
+
+  .essay-meta-col {
+    padding-top: 0.25rem;
+  }
+
+  .essay-num {
+    font-family: var(--serif);
+    font-size: 3rem;
+    font-weight: 300;
+    color: var(--border);
+    line-height: 1;
+    margin-bottom: 1rem;
+  }
+
+  .essay-tag {
+    font-size: 0.68rem;
+    letter-spacing: 0.16em;
+    text-transform: uppercase;
+    color: var(--accent);
+    display: block;
+    margin-bottom: 0.4rem;
+  }
+
+  .essay-date {
+    font-size: 0.78rem;
+    color: var(--muted);
+  }
+
+  .essay-content-col {}
+
+  .essay-title {
+    font-family: var(--serif);
+    font-size: clamp(1.4rem, 3vw, 2.2rem);
+    font-weight: 400;
+    line-height: 1.15;
+    margin-bottom: 0.75rem;
+  }
+
+  .essay-deck {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.75;
+    font-weight: 300;
+    margin-bottom: 1rem;
+  }
+
+  .essay-byline {
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  /* Essay Article */
+  .essay-article {
+    max-width: 680px;
+    margin: 0 auto;
+    padding: clamp(3rem, 7vw, 5rem) 0;
+  }
+
+  .article-back {
+    font-size: 0.72rem;
+    letter-spacing: 0.14em;
+    text-transform: uppercase;
+    color: var(--accent);
+    cursor: pointer;
+    margin-bottom: 3rem;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    transition: color 0.2s;
+  }
+
+  .article-back:hover { color: var(--ink); }
+
+  .article-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 5vw, 3.5rem);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .article-deck {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--muted);
+    line-height: 1.6;
+    margin-bottom: 2rem;
+    border-left: 2px solid var(--accent-light);
+    padding-left: 1.25rem;
+  }
+
+  .article-byline {
+    font-size: 0.78rem;
+    color: var(--muted);
+    letter-spacing: 0.06em;
+    display: flex;
+    gap: 1.5rem;
+    margin-bottom: 3rem;
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .article-body {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    color: var(--ink);
+    font-weight: 300;
+  }
+
+  .article-body p {
+    margin-bottom: 1.5em;
+  }
+
+  .article-body p:first-of-type::first-letter {
+    font-family: var(--serif);
+    font-size: 4.5em;
+    font-weight: 400;
+    float: left;
+    line-height: 0.8;
+    margin-right: 0.1em;
+    margin-top: 0.05em;
+    color: var(--ink);
+  }
+
+  .pull-quote {
+    font-family: var(--serif);
+    font-size: clamp(1.3rem, 3vw, 1.8rem);
+    font-weight: 400;
+    font-style: italic;
+    color: var(--ink);
+    line-height: 1.4;
+    text-align: center;
+    padding: 2.5rem 0;
+    margin: 2rem 0;
+    position: relative;
+  }
+
+  .pull-quote::before,
+  .pull-quote::after {
+    content: '';
+    display: block;
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+    margin: 0 auto;
+  }
+
+  .pull-quote::before { margin-bottom: 1.5rem; }
+  .pull-quote::after { margin-top: 1.5rem; }
+
+  /* ─── INTERVIEW PAGE ─── */
+  .interview-layout {
+    display: grid;
+    grid-template-columns: 1fr 300px;
+    gap: clamp(3rem, 5vw, 5rem);
+    padding: clamp(2rem, 5vw, 4rem) 0 clamp(4rem, 8vw, 7rem);
+    align-items: start;
+  }
+
+  .interview-main {}
+
+  .interview-header {
+    margin-bottom: clamp(2.5rem, 5vw, 4rem);
+    padding-bottom: 2rem;
+    border-bottom: 1px solid var(--border);
+  }
+
+  .interview-kicker {
+    font-size: 0.68rem;
+    letter-spacing: 0.22em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .interview-title {
+    font-family: var(--serif);
+    font-size: clamp(2rem, 4vw, 3.2rem);
+    font-weight: 400;
+    line-height: 1.1;
+    margin-bottom: 1rem;
+  }
+
+  .interview-intro {
+    font-size: 1rem;
+    color: var(--muted);
+    line-height: 1.8;
+    font-weight: 300;
+    max-width: 600px;
+  }
+
+  .qa-block {
+    margin-bottom: 3rem;
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.65s ease, transform 0.65s ease;
+  }
+
+  .qa-block.revealed {
+    opacity: 1;
+    transform: translateY(0);
+  }
+
+  .qa-question {
+    font-family: var(--sans);
+    font-size: 0.92rem;
+    font-weight: 300;
+    font-style: italic;
+    color: var(--muted);
+    margin-bottom: 0.75rem;
+    padding-left: 1.25rem;
+    border-left: 1px solid var(--border);
+    line-height: 1.7;
+  }
+
+  .qa-question .q-label {
+    display: block;
+    font-style: normal;
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.3rem;
+  }
+
+  .qa-answer {
+    font-family: var(--serif);
+    font-size: 1.15rem;
+    font-weight: 400;
+    line-height: 1.85;
+    color: var(--ink);
+  }
+
+  /* Sticky Sidebar */
+  .interview-sidebar {
+    position: sticky;
+    top: 90px;
+  }
+
+  .sidebar-photo {
+    aspect-ratio: 1;
+    background: var(--accent-light);
+    margin-bottom: 1.5rem;
+    overflow: hidden;
+    position: relative;
+  }
+
+  .sidebar-photo .photo-placeholder {
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background: linear-gradient(160deg, #E8E3DC 0%, #D4CCBf 100%);
+    font-family: var(--serif);
+    font-size: 4rem;
+    color: var(--accent);
+    font-style: italic;
+  }
+
+  .sidebar-name {
+    font-family: var(--serif);
+    font-size: 1.5rem;
+    font-weight: 400;
+    margin-bottom: 0.25rem;
+  }
+
+  .sidebar-role {
+    font-size: 0.75rem;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 1rem;
+  }
+
+  .sidebar-bio {
+    font-size: 0.88rem;
+    color: var(--muted);
+    line-height: 1.7;
+    font-weight: 300;
+    border-top: 1px solid var(--border);
+    padding-top: 1rem;
+  }
+
+  .sidebar-films {
+    margin-top: 1.25rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border);
+  }
+
+  .sidebar-films-label {
+    font-size: 0.65rem;
+    letter-spacing: 0.18em;
+    text-transform: uppercase;
+    color: var(--accent);
+    margin-bottom: 0.6rem;
+  }
+
+  .sidebar-film-item {
+    font-family: var(--serif);
+    font-size: 0.9rem;
+    font-style: italic;
+    color: var(--muted);
+    padding: 0.3rem 0;
+    border-bottom: 1px solid var(--border);
+  }
+
+  /* ─── ABOUT PAGE ─── */
+  .about-content {
+    max-width: 640px;
+    margin: 0 auto;
+    padding: clamp(4rem, 10vw, 8rem) 0;
+  }
+
+  .about-mark {
+    font-family: var(--serif);
+    font-size: clamp(3rem, 8vw, 6rem);
+    font-weight: 300;
+    font-style: italic;
+    color: var(--accent-light);
+    line-height: 1;
+    margin-bottom: 2rem;
+    letter-spacing: -0.02em;
+  }
+
+  .about-title {
+    font-family: var(--serif);
+    font-size: clamp(1.5rem, 3.5vw, 2.5rem);
+    font-weight: 400;
+    line-height: 1.15;
+    margin-bottom: 2rem;
+  }
+
+  .about-body {
+    font-size: 1.05rem;
+    line-height: 1.9;
+    font-weight: 300;
+    color: var(--muted);
+  }
+
+  .about-body p { margin-bottom: 1.5em; }
+
+  .about-body strong {
+    font-weight: 500;
+    color: var(--ink);
+  }
+
+  .about-rule {
+    width: 40px;
+    height: 1px;
+    background: var(--accent);
+    margin: 3rem 0;
+  }
+
+  .about-manifesto {
+    font-family: var(--serif);
+    font-size: 1.3rem;
+    font-style: italic;
+    font-weight: 400;
+    color: var(--ink);
+    line-height: 1.6;
+  }
+
+  /* ─── FOOTER ─── */
+  footer {
+    border-top: 1px solid var(--border);
+    padding: 3rem 0;
+    margin-top: 4rem;
+  }
+
+  .footer-inner {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+
+  .footer-logo {
+    font-family: var(--serif);
+    font-size: 1.2rem;
+    font-weight: 500;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--ink);
+  }
+
+  .footer-copy {
+    font-size: 0.78rem;
+    color: var(--accent);
+    letter-spacing: 0.06em;
+  }
+
+  /* ─── UTILITIES ─── */
+  @media (max-width: 768px) {
+    .hero-grid { grid-template-columns: 1fr; }
+    .reviews-grid { grid-template-columns: repeat(2, 1fr); }
+    .essay-row { grid-template-columns: 1fr; gap: 1rem; }
+    .interview-layout { grid-template-columns: 1fr; }
+    .interview-sidebar { position: relative; top: auto; }
+    .review-row { grid-template-columns: 60px 1fr; }
+    .review-row-rating { display: none; }
+    .nav-links { gap: 1.5rem; }
+  }
+
+  @media (max-width: 480px) {
+    .reviews-grid { grid-template-columns: 1fr; }
+    .nav-links { gap: 1rem; }
+    .nav-links a { font-size: 0.7rem; }
+  }
+</style>
+</head>
+<body>
+
+<div id="progress-bar"></div>
+
+<!-- NAV -->
+<nav>
+  <div class="nav-inner">
+    <span class="logo" onclick="showPage('home')">Meraki</span>
+    <ul class="nav-links">
+      <li><a onclick="showPage('home')" data-page="home" class="active">Home</a></li>
+      <li><a onclick="showPage('reviews')" data-page="reviews">Reviews</a></li>
+      <li><a onclick="showPage('essays')" data-page="essays">Essays</a></li>
+      <li><a onclick="showPage('interview')" data-page="interview">Interview</a></li>
+      <li><a onclick="showPage('about')" data-page="about">About</a></li>
+    </ul>
+  </div>
+</nav>
+
+<!-- ══════════════════════════════════════
+     HOME PAGE
+══════════════════════════════════════ -->
+<div id="page-home" class="page">
+  <section class="hero">
+    <div class="container">
+      <p class="hero-eyebrow">Featured Essay — April 2026</p>
+      <div class="hero-grid">
+        <div>
+          <h1 class="hero-title">On Slowness:<br>The <em>Cinema</em> of<br>Patience</h1>
+        </div>
+        <div class="hero-right">
+          <p class="hero-meta">Essay · 12 min read</p>
+          <p class="hero-excerpt">In an age of accelerated everything, a handful of filmmakers insist on stillness — on letting a shot breathe until it becomes something else entirely. This is not about pace. It is about trust.</p>
+          <span class="btn-text" onclick="showPage('essays')">Read the Essay →</span>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Ticker -->
+  <div class="ticker-wrap">
+    <div class="ticker-inner">
+      <span class="ticker-label">Currently Watching</span>
+      <span class="ticker-item">All We Imagine as Light<span>Payal Kapadia</span></span>
+      <span class="ticker-item">A Real Pain<span>Jesse Eisenberg</span></span>
+      <span class="ticker-item">The Substance<span>Coralie Fargeat</span></span>
+      <span class="ticker-item">Nickel Boys<span>RaMell Ross</span></span>
+      <span class="ticker-item">Queer<span>Luca Guadagnino</span></span>
+      <span class="ticker-item">Hard Truths<span>Mike Leigh</span></span>
+      <span class="ticker-item">I'm Still Here<span>Walter Salles</span></span>
+      <span class="ticker-label">Currently Watching</span>
+      <span class="ticker-item">All We Imagine as Light<span>Payal Kapadia</span></span>
+      <span class="ticker-item">A Real Pain<span>Jesse Eisenberg</span></span>
+      <span class="ticker-item">The Substance<span>Coralie Fargeat</span></span>
+      <span class="ticker-item">Nickel Boys<span>RaMell Ross</span></span>
+      <span class="ticker-item">Queer<span>Luca Guadagnino</span></span>
+      <span class="ticker-item">Hard Truths<span>Mike Leigh</span></span>
+      <span class="ticker-item">I'm Still Here<span>Walter Salles</span></span>
+    </div>
+  </div>
+
+  <!-- Latest Reviews -->
+  <section class="section">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Latest Reviews</h2>
+        <a class="section-link" onclick="showPage('reviews')">All Reviews →</a>
+      </div>
+      <div class="reviews-grid">
+        <div class="review-card" onclick="showPage('reviews')">
+          <div class="review-card-img">
+            <div class="film-placeholder">
+              <div class="fp-title">All We Imagine as Light</div>
+              <div class="fp-year">2024</div>
+            </div>
+          </div>
+          <div class="dots">
+            <div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div>
+          </div>
+          <div class="review-card-genre">Drama · Indian Cinema</div>
+          <div class="review-card-title">All We Imagine as Light</div>
+          <div class="review-card-dir">Payal Kapadia, 2024</div>
+        </div>
+        <div class="review-card" onclick="showPage('reviews')">
+          <div class="review-card-img">
+            <div class="film-placeholder">
+              <div class="fp-title">A Real Pain</div>
+              <div class="fp-year">2024</div>
+            </div>
+          </div>
+          <div class="dots">
+            <div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot half"></div>
+          </div>
+          <div class="review-card-genre">Comedy-Drama</div>
+          <div class="review-card-title">A Real Pain</div>
+          <div class="review-card-dir">Jesse Eisenberg, 2024</div>
+        </div>
+        <div class="review-card" onclick="showPage('reviews')">
+          <div class="review-card-img">
+            <div class="film-placeholder">
+              <div class="fp-title">The Substance</div>
+              <div class="fp-year">2024</div>
+            </div>
+          </div>
+          <div class="dots">
+            <div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div>
+          </div>
+          <div class="review-card-genre">Body Horror</div>
+          <div class="review-card-title">The Substance</div>
+          <div class="review-card-dir">Coralie Fargeat, 2024</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Essays Promo -->
+  <section class="section" style="border-top: 1px solid var(--border); background: var(--accent-light);">
+    <div class="container">
+      <div class="section-header">
+        <h2 class="section-title">Essays & Criticism</h2>
+        <a class="section-link" onclick="showPage('essays')">All Essays →</a>
+      </div>
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 3rem;">
+        <div style="cursor:pointer;" onclick="showPage('essays')">
+          <p style="font-size:0.68rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem;">Memory & Time</p>
+          <h3 style="font-family:var(--serif);font-size:1.6rem;font-weight:400;line-height:1.2;margin-bottom:0.75rem;">The Past Is Not a Place: Tarkovsky and the Archaeology of Memory</h3>
+          <p style="font-size:0.9rem;color:var(--muted);line-height:1.75;font-weight:300;">What does it mean to return somewhere that exists only inside you?</p>
+        </div>
+        <div style="cursor:pointer;" onclick="showPage('essays')">
+          <p style="font-size:0.68rem;letter-spacing:0.16em;text-transform:uppercase;color:var(--accent);margin-bottom:0.75rem;">Form & Language</p>
+          <h3 style="font-family:var(--serif);font-size:1.6rem;font-weight:400;line-height:1.2;margin-bottom:0.75rem;">Silence as Syntax: How Chantal Akerman Rewrites the Grammar of Film</h3>
+          <p style="font-size:0.9rem;color:var(--muted);line-height:1.75;font-weight:300;">Duration, repetition, and the radical act of paying attention.</p>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-logo">Meraki</span>
+        <span class="footer-copy">Cinema with Soul — Est. 2024</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     REVIEWS PAGE
+══════════════════════════════════════ -->
+<div id="page-reviews" class="page">
+  <div class="container">
+    <div class="page-hero">
+      <p class="page-eyebrow">Meraki / Reviews</p>
+      <h1 class="page-title">Film<br><em style="font-style:italic;font-family:var(--serif)">Reviews</em></h1>
+    </div>
+
+    <div class="filters">
+      <span class="filter-label">Filter</span>
+      <button class="filter-btn active" onclick="filterReviews(this,'all')">All</button>
+      <button class="filter-btn" onclick="filterReviews(this,'drama')">Drama</button>
+      <button class="filter-btn" onclick="filterReviews(this,'horror')">Horror</button>
+      <button class="filter-btn" onclick="filterReviews(this,'documentary')">Documentary</button>
+      <button class="filter-btn" onclick="filterReviews(this,'arthouse')">Arthouse</button>
+      <span class="filter-label" style="margin-left:1rem;">Decade</span>
+      <button class="filter-btn" onclick="filterReviews(this,'2020s')">2020s</button>
+      <button class="filter-btn" onclick="filterReviews(this,'2010s')">2010s</button>
+      <button class="filter-btn" onclick="filterReviews(this,'classic')">Classic</button>
+    </div>
+
+    <div class="reviews-list" id="reviews-list">
+      <div class="review-row" data-genre="drama" data-decade="2020s">
+        <div class="review-row-thumb"><div class="fp-title">All We Imagine as Light</div></div>
+        <div class="review-row-info">
+          <h3 class="review-row-title">All We Imagine as Light</h3>
+          <div class="review-row-meta">
+            <span>Payal Kapadia</span>
+            <span>2024</span>
+            <span style="color:var(--accent);">Drama</span>
+          </div>
+          <p class="review-row-excerpt">A luminous study of longing and displacement, set among nurses in Mumbai. Kapadia finds poetry in the overlooked — a city's indifference, a woman's quiet grief, two lives waiting to be remembered.</p>
+        </div>
+        <div class="review-row-rating">
+          <div class="dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div>
+        </div>
+      </div>
+      <div class="review-row" data-genre="drama" data-decade="2020s">
+        <div class="review-row-thumb"><div class="fp-title">Nickel Boys</div></div>
+        <div class="review-row-info">
+          <h3 class="review-row-title">Nickel Boys</h3>
+          <div class="review-row-meta"><span>RaMell Ross</span><span>2024</span><span style="color:var(--accent);">Drama</span></div>
+          <p class="review-row-excerpt">Adapted from Colson Whitehead's novel, Ross fashions an immersive first-person perspective that dissolves the boundary between witness and victim. Devastating and formally unlike anything else.</p>
+        </div>
+        <div class="review-row-rating">
+          <div class="dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div>
+        </div>
+      </div>
+      <div class="review-row" data-genre="horror" data-decade="2020s">
+        <div class="review-row-thumb"><div class="fp-title">The Substance</div></div>
+        <div class="review-row-info">
+          <h3 class="review-row-title">The Substance</h3>
+          <div class="review-row-meta"><span>Coralie Fargeat</span><span>2024</span><span style="color:var(--accent);">Body Horror</span></div>
+          <p class="review-row-excerpt">Fargeat dismantles the male gaze with surgical precision and gleeful excess. It is Cronenberg in Technicolor — messy, furious, and entirely intentional.</p>
+        </div>
+        <div class="review-row-rating">
+          <div class="dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot"></div></div>
+        </div>
+      </div>
+      <div class="review-row" data-genre="drama" data-decade="2020s">
+        <div class="review-row-thumb"><div class="fp-title">A Real Pain</div></div>
+        <div class="review-row-info">
+          <h3 class="review-row-title">A Real Pain</h3>
+          <div class="review-row-meta"><span>Jesse Eisenberg</span><span>2024</span><span style="color:var(--accent);">Comedy-Drama</span></div>
+          <p class="review-row-excerpt">Eisenberg understands that the best comedy lives inside grief, and that grief often announces itself as performance. Kieran Culkin is incandescent — a raw nerve in a cardigan.</p>
+        </div>
+        <div class="review-row-rating">
+          <div class="dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot half"></div></div>
+        </div>
+      </div>
+      <div class="review-row" data-genre="arthouse" data-decade="classic">
+        <div class="review-row-thumb"><div class="fp-title">Jeanne Dielman</div></div>
+        <div class="review-row-info">
+          <h3 class="review-row-title">Jeanne Dielman, 23 quai du Commerce</h3>
+          <div class="review-row-meta"><span>Chantal Akerman</span><span>1975</span><span style="color:var(--accent);">Arthouse</span></div>
+          <p class="review-row-excerpt">The greatest film ever made — and not because it shouts. Akerman's attention is an act of radical love. Three hours and twenty minutes of watching someone peel potatoes, and you understand everything.</p>
+        </div>
+        <div class="review-row-rating">
+          <div class="dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div>
+        </div>
+      </div>
+      <div class="review-row" data-genre="documentary" data-decade="2020s">
+        <div class="review-row-thumb"><div class="fp-title">No Other Land</div></div>
+        <div class="review-row-info">
+          <h3 class="review-row-title">No Other Land</h3>
+          <div class="review-row-meta"><span>Basel Adra & Yuval Abraham</span><span>2024</span><span style="color:var(--accent);">Documentary</span></div>
+          <p class="review-row-excerpt">An act of witness made inside an ongoing erasure. To watch this film is to accept that cinema can be a form of testimony — sometimes the only one left.</p>
+        </div>
+        <div class="review-row-rating">
+          <div class="dots"><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div><div class="dot filled"></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-logo">Meraki</span>
+        <span class="footer-copy">Cinema with Soul — Est. 2024</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     ESSAYS PAGE
+══════════════════════════════════════ -->
+<div id="page-essays" class="page">
+  <div class="container">
+    <div class="page-hero">
+      <p class="page-eyebrow">Meraki / Essays</p>
+      <h1 class="page-title">Long-form<br><em style="font-style:italic;font-family:var(--serif)">Criticism</em></h1>
+    </div>
+
+    <div class="essays-grid" id="essays-list">
+      <div class="essay-row" onclick="showEssay()">
+        <div class="essay-meta-col">
+          <div class="essay-num">01</div>
+          <span class="essay-tag">Memory & Time</span>
+          <span class="essay-date">March 2026</span>
+        </div>
+        <div class="essay-content-col">
+          <h2 class="essay-title">The Past Is Not a Place: Tarkovsky and the Archaeology of Memory</h2>
+          <p class="essay-deck">What does it mean to return somewhere that exists only inside you? Andrei Tarkovsky's late films are not stories about the past — they are the past, materialised and inaccessible at once.</p>
+          <span class="essay-byline">By Elara Voss · 18 min read</span>
+        </div>
+      </div>
+      <div class="essay-row" onclick="showEssay()">
+        <div class="essay-meta-col">
+          <div class="essay-num">02</div>
+          <span class="essay-tag">Form & Language</span>
+          <span class="essay-date">February 2026</span>
+        </div>
+        <div class="essay-content-col">
+          <h2 class="essay-title">Silence as Syntax: How Chantal Akerman Rewrites the Grammar of Film</h2>
+          <p class="essay-deck">Duration, repetition, the radical act of paying attention — Akerman's cinema asks whether we have the patience to see what is truly in front of us.</p>
+          <span class="essay-byline">By Tomás Reinholt · 14 min read</span>
+        </div>
+      </div>
+      <div class="essay-row" onclick="showEssay()">
+        <div class="essay-meta-col">
+          <div class="essay-num">03</div>
+          <span class="essay-tag">Politics & Gaze</span>
+          <span class="essay-date">January 2026</span>
+        </div>
+        <div class="essay-content-col">
+          <h2 class="essay-title">Who Holds the Camera: On Power, Authorship, and the Documentary Gaze</h2>
+          <p class="essay-deck">In a year marked by films that ask whether bearing witness is enough, the question of who photographs whom has never felt more urgent.</p>
+          <span class="essay-byline">By Selin Çelik · 22 min read</span>
+        </div>
+      </div>
+      <div class="essay-row" onclick="showEssay()">
+        <div class="essay-meta-col">
+          <div class="essay-num">04</div>
+          <span class="essay-tag">Sound & Score</span>
+          <span class="essay-date">December 2025</span>
+        </div>
+        <div class="essay-content-col">
+          <h2 class="essay-title">What the Ear Knows: Listening to Film in the Age of Overstimulation</h2>
+          <p class="essay-deck">We talk endlessly about what films look like, yet the deepest emotional work is done in the dark, through sound — through what is almost not there.</p>
+          <span class="essay-byline">By Elara Voss · 11 min read</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Essay Article View -->
+    <div id="essay-article" style="display:none;">
+      <div class="essay-article">
+        <span class="article-back" onclick="closeEssay()">← Back to Essays</span>
+        <p class="page-eyebrow" style="margin-bottom:1rem;">Memory & Time · Essay No. 01</p>
+        <h1 class="article-title">The Past Is Not a Place: Tarkovsky and the Archaeology of Memory</h1>
+        <p class="article-deck">What does it mean to return somewhere that exists only inside you? Andrei Tarkovsky's late films are not stories about the past — they are the past, materialised and inaccessible at once.</p>
+        <div class="article-byline">
+          <span>By Elara Voss</span>
+          <span>March 2026</span>
+          <span>18 min read</span>
+        </div>
+        <div class="article-body">
+          <p>There is a scene in <em>Mirror</em> — Andrei Tarkovsky's most autobiographical film — in which a woman stands in a field as the wind moves through the long grass around her. Nothing happens, precisely. And yet everything happens. She does not turn around. The camera does not cut. Time distends, folds over itself, becomes something other than a vessel for plot.</p>
+          <p>To watch Tarkovsky is to confront a cinema that refuses to explain itself. His films do not offer the satisfaction of resolution, nor do they reward patience with clarity. They offer something stranger and more profound: the sensation of memory itself — not the narrated past, but the past as a physical presence, as humidity in a room, as a sound heard through a wall.</p>
+
+          <div class="pull-quote">"He is not filming the past. He is trying to hold it still long enough to understand why it will not stay."</div>
+
+          <p>Tarkovsky wrote at length about what he called "sculpting in time" — the idea that cinema's essential material is not light or movement but duration, that a film is an act of preserving time the way an insect is preserved in amber. The metaphor is instructive but also slightly misleading, because amber is static, and the past in Tarkovsky's cinema is anything but.</p>
+          <p>In <em>Nostalghia</em>, the Russian poet Andrei Gorchakov travels to Italy to research the life of an eighteenth-century serf musician. He is, ostensibly, studying the past. But the film makes clear very quickly that he is being studied by it — that the past is the more active force in this transaction, the one doing the looking. Memory, for Tarkovsky, is not something you visit. It is something that visits you.</p>
+          <p>The final sequence of <em>The Sacrifice</em> — in which Alexander burns his house to the ground as a bargain with God — is perhaps the most extreme expression of this logic. To destroy the present as an offering to something larger than oneself, something that exists outside ordinary time. It is a mad act and a holy one, and Tarkovsky films it with excruciating patience, the camera refusing to avert its gaze from the catastrophe it has chosen to witness.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <footer id="essays-footer">
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-logo">Meraki</span>
+        <span class="footer-copy">Cinema with Soul — Est. 2024</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     INTERVIEW PAGE
+══════════════════════════════════════ -->
+<div id="page-interview" class="page">
+  <div class="container">
+    <div class="interview-layout">
+      <!-- Main content -->
+      <div class="interview-main">
+        <div class="interview-header">
+          <p class="interview-kicker">In Conversation · April 2026</p>
+          <h1 class="interview-title">"Cinema is the only art form that can make you feel time passing"</h1>
+          <p class="interview-intro">The director of <em>Hollow Hours</em> and <em>The Cartographer's Wife</em> speaks to Meraki about duration, restraint, and why she stopped watching films for two years.</p>
+        </div>
+
+        <div class="qa-block" id="qa-1">
+          <div class="qa-question">
+            <span class="q-label">Interviewer</span>
+            Your last two films have been described as "deliberately slow." Is that something you set out to do, or is it a conclusion critics reach when they don't know what else to say?
+          </div>
+          <p class="qa-answer">I think it's both, honestly. I do make deliberate formal choices about pace — about when to cut, about how long to stay with something. But "slow" as a critical category is almost always a complaint wearing the costume of a description. What it really means is: this film did not give me what I expected, when I expected it. And I'm fine with that. I'm more interested in what happens after the expectation dies.</p>
+        </div>
+
+        <div class="qa-block" id="qa-2">
+          <div class="qa-question">
+            <span class="q-label">Interviewer</span>
+            You stopped watching films for two years. What happened during that time, and how did it change how you work?
+          </div>
+          <p class="qa-answer">I was so saturated. I had been watching three, four films a week for fifteen years — festivals, screeners, retrospectives, homework. And at a certain point I realised I couldn't feel them anymore. They were passing through me without leaving a trace. So I stopped. I read novels, I took long walks, I cooked. I became, for the first time in years, an ordinary person with ordinary attention. When I came back to cinema, it felt like returning to something I'd loved as a child — that quality of being seized by something.</p>
+        </div>
+
+        <div class="qa-block" id="qa-3">
+          <div class="qa-question">
+            <span class="q-label">Interviewer</span>
+            <em>Hollow Hours</em> has almost no music. Was that always the plan, or did you begin with score and strip it back?
+          </div>
+          <p class="qa-answer">We had a score. A very beautiful one — I worked with a composer I admire enormously. And at some point in the edit, I watched a cut without it by accident. A technical problem. The picture played without music for about twenty minutes, and I realised that the film was louder without it. The sounds of the space — breathing, fabric, distant traffic — were doing something the music had been trying to compensate for. The music was kind, really. It was holding the audience's hand when they needed to find their own way.</p>
+        </div>
+
+        <div class="qa-block" id="qa-4">
+          <div class="qa-question">
+            <span class="q-label">Interviewer</span>
+            What do you want from an audience? Not in general — specifically from the person who sits down with one of your films.
+          </div>
+          <p class="qa-answer">I want them to get bored, and then to get curious about why they're bored, and then to stop being bored. There's a particular quality of attention that only appears on the other side of impatience — a kind of sharpened noticing. I'm not making films for the person who arrives already willing. I'm making films for the person who resists, and then gives in. That surrender is what I'm after. Not agreement. Surrender.</p>
+        </div>
+
+        <div class="qa-block" id="qa-5">
+          <div class="qa-question">
+            <span class="q-label">Interviewer</span>
+            The title of your new project — can you tell us anything about it?
+          </div>
+          <p class="qa-answer">Almost nothing, which is how I prefer it. I'll say this: it begins with a woman who has forgotten something, and it ends before we find out what. Everything in between is the texture of not-knowing. Whether that's a film or a feeling, I haven't quite decided yet.</p>
+        </div>
+      </div>
+
+      <!-- Sticky Sidebar -->
+      <aside class="interview-sidebar">
+        <div class="sidebar-photo">
+          <div class="photo-placeholder">N</div>
+        </div>
+        <h2 class="sidebar-name">Nadia Svarvati</h2>
+        <p class="sidebar-role">Film Director</p>
+        <p class="sidebar-bio">Nadia Svarvati is a Norwegian-Iranian director whose work explores memory, domestic space, and the politics of attention. Her debut feature <em>Hollow Hours</em> won the FIPRESCI Prize at Locarno; her second, <em>The Cartographer's Wife</em>, was selected for Un Certain Regard. She lives between Oslo and Paris.</p>
+        <div class="sidebar-films">
+          <p class="sidebar-films-label">Selected Filmography</p>
+          <div class="sidebar-film-item">Hollow Hours (2021)</div>
+          <div class="sidebar-film-item">The Cartographer's Wife (2023)</div>
+          <div class="sidebar-film-item">Three Short Studies in Grief (2019)</div>
+          <div class="sidebar-film-item">Untitled (in development)</div>
+        </div>
+      </aside>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-logo">Meraki</span>
+        <span class="footer-copy">Cinema with Soul — Est. 2024</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<!-- ══════════════════════════════════════
+     ABOUT PAGE
+══════════════════════════════════════ -->
+<div id="page-about" class="page">
+  <div class="container">
+    <div class="about-content">
+      <div class="about-mark">M</div>
+      <h1 class="about-title">A place for people who take cinema seriously — and themselves lightly.</h1>
+      <div class="about-rule"></div>
+      <div class="about-body">
+        <p><strong>Meraki</strong> is an independent film publication dedicated to long-form criticism, close reading, and the kinds of conversations that happen after the lights come on and no one wants to leave.</p>
+        <p>We believe that a film review is not a verdict. It is an invitation — to look again, to think differently, to notice what you missed the first time. We write slowly, about films both new and old, with as much patience as we ask of our readers.</p>
+        <p>We have no algorithm, no traffic targets, no sponsored content. We are funded by readers who think good criticism is worth paying for, and by the occasional grant from institutions patient enough to support work that does not optimize for anything in particular.</p>
+        <p>The word <em>meraki</em> is Greek. It means to do something with soul, with creativity, with love — to put a piece of yourself into what you make. It is what we ask of the filmmakers we write about. It is what we try to bring to every piece we publish.</p>
+      </div>
+      <div class="about-rule"></div>
+      <div class="about-manifesto">
+        "We do not write about films. We write because of them — because something in a frame, a cut, a held silence, asked to be thought about more carefully than the night allowed."
+      </div>
+      <div class="about-rule"></div>
+      <div class="about-body">
+        <p><strong>Founded</strong> 2024 &nbsp;·&nbsp; <strong>Based</strong> Nowhere in particular &nbsp;·&nbsp; <strong>Distributed</strong> Everywhere</p>
+        <p>For submissions, correspondence, and subscriptions: <span style="color:var(--ink);border-bottom:1px solid var(--border);">hello@meraki.film</span></p>
+      </div>
+    </div>
+  </div>
+
+  <footer>
+    <div class="container">
+      <div class="footer-inner">
+        <span class="footer-logo">Meraki</span>
+        <span class="footer-copy">Cinema with Soul — Est. 2024</span>
+      </div>
+    </div>
+  </footer>
+</div>
+
+<script>
+  let currentPage = 'home';
+
+  function showPage(id) {
+    const old = document.getElementById('page-' + currentPage);
+    if (old) {
+      old.classList.remove('active');
+      setTimeout(() => { old.classList.remove('visible'); }, 450);
+    }
+
+    document.querySelectorAll('.nav-links a').forEach(a => a.classList.remove('active'));
+    const activeLink = document.querySelector(`[data-page="${id}"]`);
+    if (activeLink) activeLink.classList.add('active');
+
+    setTimeout(() => {
+      const next = document.getElementById('page-' + id);
+      if (next) {
+        next.classList.add('visible');
+        requestAnimationFrame(() => {
+          requestAnimationFrame(() => { next.classList.add('active'); });
+        });
+      }
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+      currentPage = id;
+
+      if (id === 'interview') {
+        setTimeout(initInterviewObserver, 300);
+        document.getElementById('progress-bar').style.display = 'block';
+      } else {
+        document.getElementById('progress-bar').style.display = 'none';
+      }
+    }, 200);
+  }
+
+  function filterReviews(btn, filter) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    const rows = document.querySelectorAll('.review-row');
+    rows.forEach(row => {
+      if (filter === 'all') {
+        row.style.display = 'grid';
+      } else if (['drama','horror','documentary','arthouse'].includes(filter)) {
+        row.style.display = row.dataset.genre === filter ? 'grid' : 'none';
+      } else if (['2020s','2010s','classic'].includes(filter)) {
+        row.style.display = row.dataset.decade === filter ? 'grid' : 'none';
+      }
+    });
+  }
+
+  function showEssay() {
+    document.getElementById('essays-list').style.display = 'none';
+    document.getElementById('essays-footer').style.display = 'none';
+    const art = document.getElementById('essay-article');
+    art.style.display = 'block';
+    window.scrollTo({ top: 0 });
+  }
+
+  function closeEssay() {
+    document.getElementById('essays-list').style.display = 'grid';
+    document.getElementById('essays-footer').style.display = 'block';
+    document.getElementById('essay-article').style.display = 'none';
+  }
+
+  function initInterviewObserver() {
+    const blocks = document.querySelectorAll('.qa-block');
+    blocks.forEach((block, i) => {
+      block.style.transitionDelay = (i * 0.08) + 's';
+    });
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) entry.target.classList.add('revealed');
+      });
+    }, { threshold: 0.15, rootMargin: '0px 0px -60px 0px' });
+    blocks.forEach(b => observer.observe(b));
+  }
+
+  window.addEventListener('scroll', () => {
+    if (currentPage !== 'interview') return;
+    const page = document.getElementById('page-interview');
+    const scrollTop = window.scrollY - 64;
+    const height = page.scrollHeight - window.innerHeight;
+    const pct = Math.min(100, Math.max(0, (scrollTop / height) * 100));
+    document.getElementById('progress-bar').style.width = pct + '%';
+  });
+
+  // Init home
+  document.addEventListener('DOMContentLoaded', () => {
+    const home = document.getElementById('page-home');
+    home.classList.add('visible');
+    requestAnimationFrame(() => {
+      requestAnimationFrame(() => { home.classList.add('active'); });
+    });
+  });
+</script>
+</body>
+</html>
